@@ -1,0 +1,22 @@
+[Unit]
+Description=Arancino Transmitter
+After=network.target rc.local
+
+[Service]
+Type=simple
+User=root
+Group=root
+
+### ARANCINO TRANSMITTER ENV VARS ###
+
+# Environment File
+EnvironmentFile=/etc/arancino/vars-transmitter.env
+
+ExecStart=/bin/bash -c 'gunicorn -c "$ARANCINOCONF/gunicorn.cfg.py" arancino.ArancinoStart:run'
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=60
+#on-abort
+
+[Install]
+WantedBy=multi-user.target
