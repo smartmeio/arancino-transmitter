@@ -66,4 +66,4 @@ class ReaderFactory:
 
     def getReader(self):
         #Reader is a singleton
-        return Reader()
+        return Reader.Instance()

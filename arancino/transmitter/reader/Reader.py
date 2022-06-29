@@ -22,7 +22,6 @@ import time
 from typing import List, Callable
 from threading import Thread
 
-from arancino.Arancino import Arancino
 from arancino.ArancinoDataStore import ArancinoDataStore
 import arancino.ArancinoConstants as CONST
 from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, Singleton, ArancinoEnvironment
@@ -41,7 +40,6 @@ class Reader(Thread):
         self.__cycle_time = CONF.get("transmitter").get("reader").get("cycle_time")
         self.__log_prefix = "Arancino Reader - "
         self.__transmitter_handlers: List[Callable] = []
-        self.__arancino = Arancino()
         self.__handy_series = []
 
         # Redis Data Stores

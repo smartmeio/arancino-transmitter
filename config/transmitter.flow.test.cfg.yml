@@ -14,11 +14,6 @@ parser:
 
 sender:
 # Available Senders are: SenderDoNothing, SenderTcpSocket, SenderMqtt, SenderMqttS4T
-  class: SenderTcpSocket
+  class: SenderDoNothing
   section:
-    - tcpsocket
     - sender
-
-  tcpsocket:
-    host: localhost
-    port: 1122

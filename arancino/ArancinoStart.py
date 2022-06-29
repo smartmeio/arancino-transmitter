@@ -40,8 +40,8 @@ def __runArancino():
 
 def run():
 
-    signal.signal(signal.SIGINT, __kill())
-    signal.signal(signal.SIGTERM, __kill())
+    signal.signal(signal.SIGINT, __kill)
+    signal.signal(signal.SIGTERM, __kill)
 
     __runArancino()
 

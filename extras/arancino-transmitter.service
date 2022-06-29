@@ -12,7 +12,7 @@ Group=root
 # Environment File
 EnvironmentFile=/etc/arancino/vars-transmitter.env
 
-ExecStart=/bin/bash -c 'gunicorn -c "$ARANCINOCONF/gunicorn.cfg.py" arancino.ArancinoStart:run'
+ExecStart=/usr/local/bin/arancino-transmitter
 Restart=on-failure
 RestartSec=15
 TimeoutStopSec=60
