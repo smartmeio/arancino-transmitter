@@ -33,11 +33,11 @@ echo -------------------------------------------------
 echo ------Backup previous configurations files-------
 echo Backup previous configurations files
 timestamp=$(date +%Y%m%d_%H%M%S)
-[ -f /etc/arancino/config/arancino-transmitter.cfg.yml ] && mv $ARANCINOCONF/arancino-transmitter.cfg.yml $ARANCINOCONF/arancino-transmitter_$timestamp.cfg.yml
+[ -f /etc/arancino/config/transmitter.cfg.yml ] && mv $ARANCINOCONF/transmitter.cfg.yml $ARANCINOCONF/transmitter_$timestamp.cfg.yml
 echo -------------------------------------------------
 
 echo -------------------Copy files--------------------
-cp config/arancino-transmitter.cfg.yml $ARANCINOCONF/arancino-transmitter.cfg.yml
+cp config/transmitter.cfg.yml $ARANCINOCONF/transmitter.cfg.yml
 cp config/transmitter.flow.smartme.cfg.yml $ARANCINOCONF/transmitter.flow.smartme.cfg.yml
 cp config/transmitter.flow.stats.cfg.yml $ARANCINOCONF/transmitter.flow.stats.cfg.yml
 
