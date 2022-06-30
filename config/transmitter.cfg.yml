@@ -125,16 +125,16 @@ log:
 
 
   # Name to print with the logger
-  name: Arancino
+  name: Transmitter
 
 
   # Available Log Handlers, sets to true to enable or false to disable
   # Console Handler
-  handler_console: true
+  handler_console: false
 
 
   # File Handler
-  handler_file: false
+  handler_file: true
 
 
   # Size in MBytes only for the handler_file. Min: 1, Max: 5, Default: 1
@@ -145,11 +145,11 @@ log:
 
   # Names of log files
   # Standard Log File
-  file_log: arancino.log
+  file_log: transmitter-arancino.log
 
 
   # Error Log File
-  file_error: arancino.error.log
+  file_error: transmitter-arancino.error.log
 
 
   # Enables or disables printing of stack trace on errors
