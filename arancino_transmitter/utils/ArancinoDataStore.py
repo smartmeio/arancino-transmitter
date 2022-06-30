@@ -21,9 +21,9 @@ under the License
 import sys
 import time
 
-from arancino.utils.ArancinoUtils import Singleton, ArancinoConfig, ArancinoLogger
-#import redis
-from redistimeseries.client import Client as redis
+from arancino_transmitter.utils.ArancinoUtils import Singleton, ArancinoConfig, ArancinoLogger
+import redis
+#from redistimeseries.client import Client as redis
 
 
 LOG = ArancinoLogger.Instance().getLogger()
@@ -34,8 +34,6 @@ TRACE = CONF.get("log").get("trace")
 class ArancinoDataStore:
 
     def __init__(self):
-
-
 
         ist_type = CONF.get("redis").get("instance_type").lower()
 
@@ -55,30 +53,32 @@ class ArancinoDataStore:
 
 
         # data store
-        self.__redis_pool_dts = redis(host=host_vol, port=port_vol, db=db_std, decode_responses=dcd_rsp)
+        self.__redis_pool_dts = redis.Redis(host=host_vol, port=port_vol, db=db_std, decode_responses=dcd_rsp)
 
         # data store (reserved keys)
-        self.__redis_pool_dts_rsvd = redis(host=host_vol, port=port_vol, db=db_rsvd, decode_responses=dcd_rsp)
+        self.__redis_pool_dts_rsvd = redis.Redis(host=host_vol, port=port_vol, db=db_rsvd, decode_responses=dcd_rsp)
 
         # device store
-        self.__redis_pool_dvs = redis(host=host_per, port=port_per, db=db_dev, decode_responses=dcd_rsp)
+        self.__redis_pool_dvs = redis.Redis(host=host_per, port=port_per, db=db_dev, decode_responses=dcd_rsp)
 
         # data store persistent
-        self.__redis_pool_dts_pers = redis(host=host_per, port=port_per, db=db_per, decode_responses=dcd_rsp)
+        self.__redis_pool_dts_pers = redis.Redis(host=host_per, port=port_per, db=db_per, decode_responses=dcd_rsp)
 
         # time series
-        self.__redis_pool_tse = redis(host=host_vol, port=port_vol, db=db_tse, decode_responses=dcd_rsp)
+        self.__redis_pool_tse = redis.Redis(host=host_vol, port=port_vol, db=db_tse, decode_responses=dcd_rsp)
 
         # time series tags
-        self.__redis_pool_tag = redis(host=host_per, port=port_per, db=db_tag, decode_responses=dcd_rsp)
+        self.__redis_pool_tag = redis.Redis(host=host_per, port=port_per, db=db_tag, decode_responses=dcd_rsp)
 
 
-        self._redis_conn_dts = self.__redis_pool_dts.redis#redis.Redis(connection_pool=self.__redis_pool_dts)
-        self._redis_conn_dvs = self.__redis_pool_dvs.redis#redis.Redis(connection_pool=self.__redis_pool_dvs)
-        self._redis_conn_dts_rsvd = self.__redis_pool_dts_rsvd.redis#redis.Redis(connection_pool=self.__redis_pool_dts_rsvd)
-        self._redis_conn_dts_pers = self.__redis_pool_dts_pers.redis#redis.Redis(connection_pool=self.__redis_pool_dts_pers)
+
+        self._redis_conn_dts = self.__redis_pool_dts#redis.Redis(connection_pool=self.__redis_pool_dts)
+        self._redis_conn_dvs = self.__redis_pool_dvs#redis.Redis(connection_pool=self.__redis_pool_dvs)
+        self._redis_conn_dts_rsvd = self.__redis_pool_dts_rsvd#.redis#redis.Redis(connection_pool=self.__redis_pool_dts_rsvd)
+        self._redis_conn_dts_pers = self.__redis_pool_dts_pers#.redis#redis.Redis(connection_pool=self.__redis_pool_dts_pers)
         self._redis_conn_tse = self.__redis_pool_tse#redis.Redis(connection_pool=self.__redis_pool_tse)
-        self._redis_conn_tag = self.__redis_pool_tag.redis
+        self._redis_conn_tag = self.__redis_pool_tag#.redis
+        #self._redis_conn_stng = self.__redis_pool_stng#.redis
 
         self.__attempts = 1
         self.__attempts_tot = CONF.get("redis").get("connection_attempts")
@@ -95,7 +95,9 @@ class ArancinoDataStore:
                 self._redis_conn_dvs.ping()
                 self._redis_conn_dts_rsvd.ping()
                 self._redis_conn_dts_pers.ping()
-                self._redis_conn_tse.redis.ping()
+                self._redis_conn_tse.ping()
+                self._redis_conn_tag.ping()
+                #self._redis_conn_stng.ping()
                 break
 
             except Exception as ex:
@@ -167,6 +169,8 @@ class ArancinoDataStore:
         return self._redis_conn_tag
 
 
+
+
     def closeAll(self):
         try:
             self.getDataStoreStd().connection_pool.disconnect()
@@ -174,5 +178,6 @@ class ArancinoDataStore:
             self.getDataStorePer().connection_pool.disconnect()
             self.getDataStoreRsvd().connection_pool.disconnect()
             self.getDataStoreTse().connection_pool.disconnect()
+           # self.getDataStoreStng().connection_pool.disconnect()
         except Exception as ex:
             pass

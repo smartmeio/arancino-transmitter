@@ -19,27 +19,38 @@ License for the specific language governing permissions and limitations
 under the License
 """
 
-from arancino.transmitter.sender.SenderMqtt import SenderMqtt
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
-
+from arancino_transmitter.transmitter.parser.ParserSimple import ParserSimple
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
 
 LOG = ArancinoLogger.Instance().getLogger()
 CONF = ArancinoConfig.Instance().cfg
 TRACE = CONF.get("log").get("trace")
 ENV = ArancinoEnvironment.Instance()
 
-class SenderMqttS4T(SenderMqtt):
+
+
+class ParserS4T(ParserSimple):
 
     def __init__(self, cfg=None):
         super().__init__(cfg=cfg)
+        #private
+
+        #self.__db_name = CONF.get_transmitter_parser_s4t_db_name()
+        self.__db_name = self.cfg.get("s4t").get("db_name")
+
+
+        #protected
+    
+    def _do_elaboration(self, data=None):
+
+        rendered_data, metadata = super()._do_elaboration(data)
+
+        if metadata:
+            for index, md in enumerate(metadata):
+                md["tags"] = data[index]["tags"]
+                md["labels"] = data[index]["labels"]
+                md["db_name"] = self.__db_name
         
-    def _do_trasmission(self, data=None, metadata=None):
-        tags = ""
-        for key, value in metadata["labels"].items():
-            tmp = "{}={}".format(key, value)
-            tags += tmp + '/'
-        for key, value in metadata["tags"].items():
-            tmp = "{}={}".format(key, value)
-            tags += tmp + '/'
-        self._topic = "{}/{}{}".format(metadata["db_name"], tags, metadata["key"].split(':')[1][:-2])
-        return super()._do_trasmission(data=data, metadata=metadata)
+        return rendered_data, metadata
+
+

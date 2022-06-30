@@ -1,8 +1,7 @@
-# coding=utf-8
-"""
+'''
 SPDX-license-identifier: Apache-2.0
 
-Copyright (c) 2021 smartme.IO
+Copyright (c) 2019 SmartMe.IO
 
 Authors:  Sergio Tomasello <sergio@smartme.io>
 
@@ -17,27 +16,34 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations
 under the License
-"""
-from arancino.transmitter.sender.Sender import Sender
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
+'''
+
+import signal
+from arancino_transmitter.transmitter.Transmitter import Transmitter
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoEnvironment
+from arancino_transmitter.utils.ArancinoUtils import ArancinoConfig
+
 
 LOG = ArancinoLogger.Instance().getLogger()
 CONF = ArancinoConfig.Instance().cfg
 TRACE = CONF.get("log").get("trace")
 ENV = ArancinoEnvironment.Instance()
 
+t = Transmitter()
+
+def __kill():
+    t.stop()
+
+def __runArancino():
+    t.start()
 
 
-class SenderDoNothing(Sender):
+def run():
 
-    def __init__(self, cfg=None):
-        super().__init__(cfg=cfg)
-    
-    def start(self):
-        pass
+    signal.signal(signal.SIGINT, __kill)
+    signal.signal(signal.SIGTERM, __kill)
 
-    def stop(self):
-        pass
+    __runArancino()
 
-    def _do_trasmission(self, data=None, metadata=None):
-        return True
+if __name__ == '__main__':
+    run()

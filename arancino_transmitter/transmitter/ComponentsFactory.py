@@ -18,10 +18,10 @@ License for the specific language governing permissions and limitations
 under the License
 '''
 
-from arancino.transmitter.parser import Parser
-from arancino.transmitter.sender import Sender
-from arancino.transmitter.reader.Reader import Reader
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
+from arancino_transmitter.transmitter.parser import Parser
+from arancino_transmitter.transmitter.sender import Sender
+from arancino_transmitter.transmitter.reader.Reader import Reader
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
 import importlib
 
 LOG = ArancinoLogger.Instance().getLogger()
@@ -38,7 +38,7 @@ class ParserFactory:
 
     def getParser(self, parserCls, parserCfg) -> Parser:
         class_parser_name = parserCls
-        module_parser = importlib.import_module("arancino.transmitter.parser." + class_parser_name)
+        module_parser = importlib.import_module("arancino_transmitter.transmitter.parser." + class_parser_name)
         class_parser = getattr(module_parser, class_parser_name)
         parser = class_parser(cfg=parserCfg)
         return parser
@@ -52,7 +52,7 @@ class SenderFactory:
 
     def getSender(self, senderCls, senderCfg) -> Sender:
         class_sender_name = senderCls
-        module_sender = importlib.import_module("arancino.transmitter.sender." + class_sender_name)
+        module_sender = importlib.import_module("arancino_transmitter.transmitter.sender." + class_sender_name)
         class_sender = getattr(module_sender, class_sender_name)
         sender = class_sender(cfg=senderCfg)
         return sender

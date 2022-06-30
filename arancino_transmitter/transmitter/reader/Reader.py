@@ -22,9 +22,9 @@ import time
 from typing import List, Callable
 from threading import Thread
 
-from arancino.ArancinoDataStore import ArancinoDataStore
-import arancino.ArancinoConstants as CONST
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, Singleton, ArancinoEnvironment
+from arancino_transmitter.ArancinoDataStore import ArancinoDataStore
+import arancino_transmitter.ArancinoConstants as CONST
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, Singleton, ArancinoEnvironment
 
 LOG = ArancinoLogger.Instance().getLogger()
 CONF = ArancinoConfig.Instance().cfg

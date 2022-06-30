@@ -19,9 +19,9 @@ License for the specific language governing permissions and limitations
 under the License
 """
 
-from arancino.transmitter.parser.Parser import Parser
-import arancino.ArancinoConstants as CONST
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
+from arancino_transmitter.transmitter.parser.Parser import Parser
+import arancino_transmitter.ArancinoConstants as CONST
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
 
 LOG = ArancinoLogger.Instance().getLogger()
 CONF = ArancinoConfig.Instance().cfg

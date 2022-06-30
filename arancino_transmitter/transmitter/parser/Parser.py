@@ -23,8 +23,8 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import os
 from jinja2 import Template
-from arancino.ArancinoDataStore import ArancinoDataStore
-from arancino.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
+from arancino_transmitter.ArancinoDataStore import ArancinoDataStore
+from arancino_transmitter.utils.ArancinoUtils import ArancinoLogger, ArancinoConfig, ArancinoEnvironment
 
 
 LOG = ArancinoLogger.Instance().getLogger()

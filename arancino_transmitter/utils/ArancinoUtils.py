@@ -25,10 +25,10 @@ import sys
 import os
 import semantic_version
 from ruamel.yaml import YAML
-import arancino
+import arancino_transmitter
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from arancino.ArancinoConstants import EnvType
+from arancino_transmitter.ArancinoConstants import EnvType
 
 
 class Singleton:
@@ -63,7 +63,7 @@ class ArancinoEnvironment:
         self._log_dir = os.environ.get('ARANCINOLOG')
         self._tmplt_dir = os.path.join(self._home_dir, "templates")
 
-        self._version = semantic_version.Version(arancino.__version__)
+        self._version = semantic_version.Version(arancino_transmitter.__version__)
 
         # Recupero il serial number / uuid dalla variabile di ambiente (quando sarà disponibile) altrimenti lo recupero dal seriale
         #   del dispositivo come veniva fatto in precedenza

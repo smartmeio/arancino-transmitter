@@ -59,7 +59,7 @@ class ArancinoPostInstallCommand(install):
 def get_version():
     """Get version number of the package from version.py without importing core module."""
     package_dir = os.path.abspath(os.path.dirname(__file__))
-    version_file = os.path.join(package_dir, 'arancino/version.py')
+    version_file = os.path.join(package_dir, 'arancino_transmitter/version.py')
 
     namespace = {}
     with open(version_file, 'rt') as f:
@@ -67,14 +67,14 @@ def get_version():
 
     return namespace['__version__']
 
-with open("arancino/version.py", encoding="utf8") as f:
+with open("arancino_transmitter/version.py", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read())
 
 setup(
 
     version=version,
 
-    provides=['arancino'],
+    provides=['arancino_transmitter'],
 
     cmdclass={
         'install': ArancinoPostInstallCommand
