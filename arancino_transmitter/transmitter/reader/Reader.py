@@ -46,6 +46,7 @@ class Reader(Thread):
         redis = ArancinoDataStore.Instance()
         self.__datastore_tser = redis.getDataStoreTse()
         self.__datastore_tag = redis.getDataStoreTag()
+        self.__pipeline = self.__datastore_tser.pipeline()
 
 
     def attachHandler(self, handler: Callable):
@@ -74,7 +75,7 @@ class Reader(Thread):
             try:
                 # get all the timeseries keys.
                 ts_keys = self.__retrieve_ts_keys()
-                
+
 
                 # series = []
                 for key in ts_keys:
@@ -89,11 +90,11 @@ class Reader(Thread):
                         starting_tms_ts = k_info.first_time_stamp
                         if starting_tms_ts == 0:
                             continue
-                    
+
                     tag_keys = self.__retrieve_tags_keys(key)
                     label_keys = self.__retrieve_label_keys(key.split(':')[0])
                     tag_keys += label_keys
-                    
+
                     for tk in tag_keys:
                         k = tk.split(':')[-1]
                         val = self.__datastore_tag.lrange(tk, 0, -1)
@@ -112,7 +113,7 @@ class Reader(Thread):
                             segment = list(segment)
                             segment[0] = t_start
                             batch_mode = True
-                        
+
                         if not batch_mode:
                             self.__read(key, segment)
                             continue
@@ -127,9 +128,13 @@ class Reader(Thread):
                                 batch_mode = False
                                 LOG.info('BATCH MODE END')
 
+                    self.__pipeline.delrange(key, 0, starting_tms_ts - 1)
+                    LOG.debug(f"DELETING DATA OF KEY: {key} TO TS: {starting_tms_ts}")
+
             except Exception as ex:
                 LOG.exception("{}Error in the main loop: {}".format(self.__log_prefix, str(ex)), exc_info=TRACE)
 
+            self.__pipeline.execute()
             time.sleep(self.__cycle_time)
 
         LOG.info("{}Stopped.".format(self.__log_prefix))
@@ -138,16 +143,16 @@ class Reader(Thread):
         values = self.__retrieve_ts_values_by_key(key, *segment)
         if values:
             self.__handy_series.append(values)
-            
+
         LOG.debug("Time Series Data: " + str(self.__handy_series))
         self.__notiify(self.__handy_series)
         # clear the handy variables
         self.__handy_series = []
 
 
-    
+
     def find_segments(self, tags, ts):
-        
+
         inf_ts = ts
         sup_ts = -1
         segments = []
@@ -166,8 +171,8 @@ class Reader(Thread):
 
             if len(min_tags):
                     min_tags.sort(key = lambda t: t[0][0])
-                    sup_ts = min_tags[0][0][0] - 1 
-                
+                    sup_ts = min_tags[0][0][0] - 1
+
             if inf_ts == sup_ts or len(min_tags) == 0:
                 sup_ts = '+'
 
@@ -186,7 +191,7 @@ class Reader(Thread):
 
             segments.append((inf_ts, sup_ts, selected_tags))
             inf_ts = sup_ts + 1 if sup_ts != '+' else sup_ts
-        
+
         return segments
 
 
@@ -196,7 +201,7 @@ class Reader(Thread):
         key = metadata["key"]
         ending_tms_ts = metadata["last_ts"] + 1
         flow_name = metadata["flow_name"]
-        
+
         self.__datastore_tser.redis.set("{}:{}:{}".format(key, flow_name, CONST.SUFFIX_TMSTP), str(ending_tms_ts))
 
 
