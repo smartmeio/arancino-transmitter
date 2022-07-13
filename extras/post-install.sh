@@ -40,6 +40,7 @@ echo -------------------Copy files--------------------
 cp config/transmitter.cfg.yml $ARANCINOCONF/transmitter.cfg.yml
 cp config/transmitter.flow.smartme.cfg.yml $ARANCINOCONF/transmitter.flow.smartme.cfg.yml
 cp config/transmitter.flow.stats.cfg.yml $ARANCINOCONF/transmitter.flow.stats.cfg.yml
+cp config/transmitter.flow.test.cfg.yml $ARANCINOCONF/transmitter.flow.test.cfg.yml
 
 cp templates/default.json.tmpl $ARANCINO/templates/default.json.tmpl
 cp templates/default.xml.tmpl $ARANCINO/templates/default.xml.tmpl
