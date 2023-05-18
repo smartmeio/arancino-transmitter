@@ -95,7 +95,7 @@ class ArancinoDataStore:
                 self._redis_conn_dvs.ping()
                 self._redis_conn_dts_rsvd.ping()
                 self._redis_conn_dts_pers.ping()
-                self._redis_conn_tse.redis.ping()
+                self._redis_conn_tse.ping()
                 break
 
             except Exception as ex:

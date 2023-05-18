@@ -81,9 +81,9 @@ class Reader(Thread):
                 for key in ts_keys:
                     tags = {}
                     tms_pattern = "{}:*:{}".format(key, CONST.SUFFIX_TMSTP)
-                    tms_keys = self.__datastore_tser.redis.keys(tms_pattern)
+                    tms_keys = self.__datastore_tser.keys(tms_pattern)
                     if len(tms_keys):
-                        tms_list = self.__datastore_tser.redis.mget(tms_keys)
+                        tms_list = self.__datastore_tser.mget(tms_keys)
                         starting_tms_ts = min(list(map(int, tms_list)))
                     else:
                         k_info = self.__datastore_tser.info(key)
@@ -244,9 +244,9 @@ class Reader(Thread):
         try:
 
             #region # 1.  Retrieve all the Keys of Time Series type
-            keys_iter = self.__datastore_tser.redis.scan_iter("*")
+            keys_iter = self.__datastore_tser.scan_iter("*")
             for key in keys_iter:
-                if self.__datastore_tser.redis.type(key) == "TSDB-TYPE":
+                if self.__datastore_tser.type(key) == "TSDB-TYPE":
                     keys.append(key)
             #endregion
 
