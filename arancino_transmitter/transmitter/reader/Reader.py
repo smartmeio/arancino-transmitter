@@ -87,7 +87,7 @@ class Reader(Thread):
                         starting_tms_ts = min(list(map(int, tms_list)))
                     else:
                         k_info = self.__datastore_tser.ts().info(key)
-                        starting_tms_ts = k_info.first_time_stamp
+                        starting_tms_ts = k_info.first_timestamp
                         if starting_tms_ts == 0:
                             continue
 
