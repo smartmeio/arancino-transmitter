@@ -105,8 +105,9 @@ class Reader(Thread):
 
                     for segment in segments:
                         batch_mode = False
-                        t_start = segment[0] if segment[0] != 0 else int(self.__datastore_tser.ts().info(key).first_time_stamp)
-                        t_end = segment[1] if segment[1] != '+' else int(self.__datastore_tser.ts().info(key).lastTimeStamp)
+                        info = self.__datastore_tser.ts().info(key)
+                        t_start = segment[0] if segment[0] != 0 else int(info.first_timestamp)
+                        t_end = segment[1] if segment[1] != '+' else int(info.last_timestamp)
 
                         if t_end - t_start > 300000:
                             LOG.info('BATCH MODE START')
