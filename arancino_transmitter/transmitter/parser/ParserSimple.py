@@ -52,7 +52,7 @@ class ParserSimple(Parser):
                 # do parsing only if template is loaded
                 if self._tmpl:
                     for d in data: 
-                        last_tms = self._datastore_tser.redis.get("{}:{}:{}".format(d["key"], self._flow_name, CONST.SUFFIX_TMSTP))
+                        last_tms = self._datastore_tser.get("{}:{}:{}".format(d["key"], self._flow_name, CONST.SUFFIX_TMSTP))
                         if last_tms:
                             last_tms = int(last_tms)
                         else:

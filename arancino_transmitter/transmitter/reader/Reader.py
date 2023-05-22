@@ -46,7 +46,7 @@ class Reader(Thread):
         redis = ArancinoDataStore.Instance()
         self.__datastore_tser = redis.getDataStoreTse()
         self.__datastore_tag = redis.getDataStoreTag()
-        self.__pipeline = self.__datastore_tser.pipeline()
+        self.__pipeline = self.__datastore_tser.ts().pipeline()
 
 
     def attachHandler(self, handler: Callable):
@@ -86,7 +86,7 @@ class Reader(Thread):
                         tms_list = self.__datastore_tser.mget(tms_keys)
                         starting_tms_ts = min(list(map(int, tms_list)))
                     else:
-                        k_info = self.__datastore_tser.info(key)
+                        k_info = self.__datastore_tser.ts().info(key)
                         starting_tms_ts = k_info.first_time_stamp
                         if starting_tms_ts == 0:
                             continue
@@ -105,8 +105,8 @@ class Reader(Thread):
 
                     for segment in segments:
                         batch_mode = False
-                        t_start = segment[0] if segment[0] != 0 else int(self.__datastore_tser.info(key).first_time_stamp)
-                        t_end = segment[1] if segment[1] != '+' else int(self.__datastore_tser.info(key).lastTimeStamp)
+                        t_start = segment[0] if segment[0] != 0 else int(self.__datastore_tser.ts().info(key).first_time_stamp)
+                        t_end = segment[1] if segment[1] != '+' else int(self.__datastore_tser.ts().info(key).lastTimeStamp)
 
                         if t_end - t_start > 300000:
                             LOG.info('BATCH MODE START')
@@ -128,7 +128,8 @@ class Reader(Thread):
                                 batch_mode = False
                                 LOG.info('BATCH MODE END')
 
-                    self.__pipeline.delrange(key, 0, starting_tms_ts - 1)
+                    #self.__pipeline.delrange(key, 0, starting_tms_ts - 1)
+                    self.__datastore_tser.ts().delete(key, 0, starting_tms_ts - 1)
                     LOG.debug(f"DELETING DATA OF KEY: {key} TO TS: {starting_tms_ts}")
 
             except Exception as ex:
@@ -202,7 +203,7 @@ class Reader(Thread):
         ending_tms_ts = metadata["last_ts"] + 1
         flow_name = metadata["flow_name"]
 
-        self.__datastore_tser.redis.set("{}:{}:{}".format(key, flow_name, CONST.SUFFIX_TMSTP), str(ending_tms_ts))
+        self.__datastore_tser.set("{}:{}:{}".format(key, flow_name, CONST.SUFFIX_TMSTP), str(ending_tms_ts))
 
 
 
@@ -220,7 +221,7 @@ class Reader(Thread):
             #starting_tms_ts = self.__datastore_tser.redis.get("{}:{}".format(key, CONST.SUFFIX_TMSTP))
             starting_tms_ts = start
             ending_tms_ts = end
-            values = self.__datastore_tser.range(key, starting_tms_ts, ending_tms_ts)
+            values = self.__datastore_tser.ts().range(key, starting_tms_ts, ending_tms_ts)
             #endregion
 
             #region # 3. aggregate timeseries data
@@ -228,7 +229,7 @@ class Reader(Thread):
             if index > 0:
                 timeseries["key"] = key
                 timeseries["timestamps"], timeseries["values"] = map(list, zip(*values))
-                timeseries["labels"] = self.__datastore_tser.info(key).labels
+                timeseries["labels"] = self.__datastore_tser.ts().info(key).labels
                 timeseries["tags"] = tags
             #endregion
 
