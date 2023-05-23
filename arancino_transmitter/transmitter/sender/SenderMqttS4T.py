@@ -41,5 +41,12 @@ class SenderMqttS4T(SenderMqtt):
         for key, value in metadata["tags"].items():
             tmp = "{}={}".format(key, value)
             tags += tmp + '/'
-        self._topic = "{}/{}{}".format(metadata["db_name"], tags, metadata["key"].split(':')[1][:-2])
+        full_field=metadata["key"].split(':')[1]
+        channel="0"
+        field=full_field
+        if '-'in full_field:
+            field=full_field.split('-')[0]
+            channel=full_field.split('-')[1]
+        tags += "channel={}/".format(channel)
+        self._topic = "{}/{}{}".format(metadata["db_name"], tags, field)
         return super()._do_trasmission(data=data, metadata=metadata)
