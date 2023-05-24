@@ -129,8 +129,8 @@ class Reader(Thread):
                                 batch_mode = False
                                 LOG.info('BATCH MODE END')
 
-                    #self.__pipeline.delrange(key, 0, starting_tms_ts - 1)
-                    self.__datastore_tser.ts().delete(key, 0, starting_tms_ts - 1)
+                    self.__pipeline.delete(key, 0, starting_tms_ts - 1)
+                    #self.__datastore_tser.ts().delete(key, 0, starting_tms_ts - 1)
                     LOG.debug(f"DELETING DATA OF KEY: {key} TO TS: {starting_tms_ts}")
 
             except Exception as ex:
