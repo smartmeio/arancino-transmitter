@@ -1,4 +1,4 @@
-# Arancino Transmitter: Module to transmit timeseries data to cloud
+# Arancino Transmitter: Transmits timeseries data to the Cloud
 
 This module transmits the data stored in redis timeseries to cloud in different manners.
 
