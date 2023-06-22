@@ -6,7 +6,7 @@ transmitter:
 
   # Flows that run on the transmitter. Each flow is defined by a configuration file.
   flows:
-    - test
+    - smartme
 
   reader:
 
