@@ -45,12 +45,21 @@ class SenderMqtt(Sender):
         self._client = None
 
         if self._use_tls:
-            self._ca_file = self.cfg.get("mqtt").get("ca_file") #CONF.get_transmitter_sender_mqtt_ca_path()
-            self._cert_file = self.cfg.get("mqtt").get("cert_file") #CONF.get_transmitter_sender_mqtt_cert_path()
-            self._key_file = self.cfg.get("mqtt").get("key_file") #CONF.get_transmitter_sender_mqtt_key_path()
-        else:
-            self._username = self.cfg.get("mqtt").get("username") #CONF.get_transmitter_sender_mqtt_username()
-            self._password = self.cfg.get("mqtt").get("password") #CONF.get_transmitter_sender_mqtt_password()
+            if self.cfg.get("mqtt").get("ca_path") == "":
+                self._ca_file = None
+            else:
+                self._ca_file = self.cfg.get("mqtt").get("ca_path") #CONF.get_transmitter_sender_mqtt_ca_path()
+            if self.cfg.get("mqtt").get("cert_path") == "":
+                self._cert_file = None
+            else:
+                self._cert_file = self.cfg.get("mqtt").get("cert_path") #CONF.get_transmitter_sender_mqtt_cert_path()
+            if self.cfg.get("mqtt").get("key_path") == "":
+                self._key_file = None
+            else:
+                self._key_file = self.cfg.get("mqtt").get("key_path") #CONF.get_transmitter_sender_mqtt_key_path()
+        #else:
+        self._username = self.cfg.get("mqtt").get("username") #CONF.get_transmitter_sender_mqtt_username()
+        self._password = self.cfg.get("mqtt").get("password") #CONF.get_transmitter_sender_mqtt_password()
         
         #protected
         self._topic = self.cfg.get("mqtt").get("topic")  # CONF.get_transmitter_sender_mqtt_topic()
@@ -95,8 +104,7 @@ class SenderMqtt(Sender):
             client.connected_flag = False
             if self._use_tls:
                 client.tls_set(ca_certs=self._ca_file, certfile=self._cert_file, keyfile=self._key_file)
-            else:
-                client.username_pw_set(username=self._username, password=self._password)
+            client.username_pw_set(username=self._username, password=self._password)
 
             client.on_connect = self.__on_connect
             client.on_disconnect = self.__on_disconnect
