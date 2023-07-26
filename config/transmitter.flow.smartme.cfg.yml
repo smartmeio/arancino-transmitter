@@ -15,7 +15,11 @@ parser:
 
   s4t:
   # Configuration for ParserS4T
-    db_name: sme_sandbox
+    #db_name: sme_sandbox
+
+    # if env vars (FMPROJNAME, FMFLEETNAME) are not setted, get these
+    fleet_manager_project_name: default
+    fleet_manager_fleet_name: default
 
 sender:
 # Available Senders are: SenderDoNothing, SenderTcpSocket, SenderMqtt, SenderMqttS4T
@@ -42,10 +46,10 @@ sender:
     topic: your_topic
 
     # plain
-    host: server.smartme.io
+    host: vulcano.smartme.io
     port: 1883
-    username: username
-    password: password
+    username: arancini
+    password: smartme
 
     # secure
     ca_path:
