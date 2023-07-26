@@ -41,6 +41,7 @@ class ParserS4T(ParserSimple):
 
         self.__fm_proj_name = ENV.fleet_manager_project_name if ENV.fleet_manager_project_name else self.cfg.get("s4t").get("fleet_manager_project_name")
         self.__fm_fleet_name = ENV.fleet_manager_fleet_name if ENV.fleet_manager_fleet_name else self.cfg.get("s4t").get("fleet_manager_fleet_name")
+        self.__fm_edge_name = ENV.fleet_manager_edge_name if ENV.fleet_manager_edge_name else self.cfg.get("s4t").get("fleet_manager_edge_name")
 
         # Redis Data Stores
         redis = ArancinoDataStore.Instance()
@@ -57,15 +58,16 @@ class ParserS4T(ParserSimple):
                 md["tags"] = data[index]["tags"]
                 md["tags"]["fm_proj_name"] = self.__fm_proj_name
                 md["tags"]["fm_fleet_name"] = self.__fm_fleet_name
+                md["tags"]["fm_edge_name"] = self.__fm_edge_name
 
                 md["labels"] = data[index]["labels"]
 
                 port_id = data[index]["labels"]["port_id"]
                 port_alias = self.__datastore_dev.hget(port_id, "C_ALIAS")
                 if port_alias:
-                    md["labels"]["alias"] = port_alias
+                    md["labels"]["port_alias"] = port_alias
 
-                md["db_name"] = self.__db_name
+                #md["db_name"] = self.__db_name
         
         return rendered_data, metadata
 

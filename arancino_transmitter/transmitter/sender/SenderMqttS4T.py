@@ -77,6 +77,6 @@ class SenderMqttS4T(SenderMqtt):
 
         tags += "channel={}/".format(channel)
         #self._topic = "{}/{}{}".format(metadata["db_name"], tags, field)
-        self._topic = "{}/{}{}".format(self._topic, tags, field)
+        self._topic = "{}/{}{}".format(self.cfg.get("mqtt").get("topic"), tags, field)
 
         return super()._do_trasmission(data=data, metadata=metadata)

@@ -42,6 +42,7 @@ EDGE_MQTT_DATA_HOST = "EDGEMQTTDATAHOST"
 
 FM_PROJ_NAME = "FMPROJNAME"     # Nome Progetto nel Fleet Manager
 FM_FLEET_NAME = "FMFLEETNAME"   # Nome della Flotta nel Fleet Manager
+FM_EDGE_NAME = "FMEDGENAME"     # Nome dell'Edge device nel Fleet Manager
 
 A_ENV = "ARANCINOENV"           # Tipo di ambiente in cui sta girando il servizio
 A_HOME = "ARANCINO"             # Wokring Directory di Arancino
@@ -90,6 +91,7 @@ class ArancinoEnvironment:
 
         self._fleet_manager_project_name = os.getenv(FM_PROJ_NAME)
         self._fleet_manager_fleet_name = os.getenv(FM_FLEET_NAME)
+        self._fleet_manager_edge_name = os.getenv(FM_EDGE_NAME)
 
         self._sender_mqtt_host = os.getenv(EDGE_MQTT_DATA_HOST)
         self._sender_mqtt_user = os.getenv(EDGE_MQTT_DATA_USER)
@@ -161,6 +163,11 @@ class ArancinoEnvironment:
     @property
     def fleet_manager_fleet_name(self):
         return self._fleet_manager_fleet_name
+
+
+    @property
+    def fleet_manager_edge_name(self):
+        return self._fleet_manager_edge_name
 
 
     # TODO: rivedere questo metodo.

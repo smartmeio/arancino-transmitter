@@ -20,6 +20,7 @@ parser:
     # if env vars (FMPROJNAME, FMFLEETNAME) are not setted, get these
     fleet_manager_project_name: default
     fleet_manager_fleet_name: default
+    fleet_manager_edge_name: default
 
 sender:
 # Available Senders are: SenderDoNothing, SenderTcpSocket, SenderMqtt, SenderMqttS4T
