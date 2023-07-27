@@ -31,6 +31,26 @@ from logging.handlers import RotatingFileHandler
 from arancino_transmitter.ArancinoConstants import EnvType
 
 
+
+#region ENV VARS NAME
+EDGE_UUID = "EDGEUUID"
+
+EDGE_MQTT_DATA_PWD = "EDGEMQTTDATAPWD"
+EDGE_MQTT_DATA_USER = "EDGEMQTTDATAUSER"
+EDGE_MQTT_DATA_PORT = "EDGEMQTTDATAPORT"
+EDGE_MQTT_DATA_HOST = "EDGEMQTTDATAHOST"
+
+FM_PROJ_NAME = "FMPROJNAME"     # Nome Progetto nel Fleet Manager
+FM_FLEET_NAME = "FMFLEETNAME"   # Nome della Flotta nel Fleet Manager
+FM_EDGE_NAME = "FMEDGENAME"     # Nome dell'Edge device nel Fleet Manager
+
+A_ENV = "ARANCINOENV"           # Tipo di ambiente in cui sta girando il servizio
+A_HOME = "ARANCINO"             # Wokring Directory di Arancino
+A_CFG = "ARANCINOCONF"          # Directory dove si trovano i cfg file
+A_LOG = "ARANCINOLOG"           # Directory dove si trovano i log file
+
+#endregion
+
 class Singleton:
 
     def __init__(self, cls):
@@ -67,7 +87,37 @@ class ArancinoEnvironment:
 
         # Recupero il serial number / uuid dalla variabile di ambiente (quando sarà disponibile) altrimenti lo recupero dal seriale
         #   del dispositivo come veniva fatto in precedenza
-        self._serial_number = os.getenv("EDGEUUID") if os.getenv("EDGEUUID") else self._retrieve_serial_number()
+        self._serial_number = os.getenv(EDGE_UUID) if os.getenv(EDGE_UUID) else self._retrieve_serial_number()
+
+        self._fleet_manager_project_name = os.getenv(FM_PROJ_NAME)
+        self._fleet_manager_fleet_name = os.getenv(FM_FLEET_NAME)
+        self._fleet_manager_edge_name = os.getenv(FM_EDGE_NAME)
+
+        self._sender_mqtt_host = os.getenv(EDGE_MQTT_DATA_HOST)
+        self._sender_mqtt_user = os.getenv(EDGE_MQTT_DATA_USER)
+        self._sender_mqtt_pwd = os.getenv(EDGE_MQTT_DATA_PWD)
+        self._sender_mqtt_port = os.getenv(EDGE_MQTT_DATA_PORT)
+
+
+    @property
+    def sender_mqtt_host(self):
+        return self._sender_mqtt_host
+
+
+    @property
+    def sender_mqtt_user(self):
+        return self._sender_mqtt_user
+
+
+    @property
+    def sender_mqtt_pwd(self):
+        return self._sender_mqtt_pwd
+
+
+    @property
+    def sender_mqtt_port(self):
+        return self._sender_mqtt_port
+
 
     @property
     def env(self):
@@ -103,6 +153,21 @@ class ArancinoEnvironment:
     def serial_number(self):
         return self._serial_number
         #return self.__retrieve_serial_number()
+
+
+    @property
+    def fleet_manager_project_name(self):
+        return self._fleet_manager_project_name
+
+
+    @property
+    def fleet_manager_fleet_name(self):
+        return self._fleet_manager_fleet_name
+
+
+    @property
+    def fleet_manager_edge_name(self):
+        return self._fleet_manager_edge_name
 
 
     # TODO: rivedere questo metodo.
