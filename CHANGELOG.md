@@ -1,6 +1,6 @@
 # Changelog
 
-#### v 1.1.0 - 2023.07.XX
+#### v 1.1.0 - 2023.07.27
 * Add: Alias Tag [#1](https://git.smartme.io/smartme.io/arancino/arancino-services/arancino-transmitter/-/issues/1)
 * Chg: remove `db_name` param and use `topic` [#3](https://git.smartme.io/smartme.io/arancino/arancino-services/arancino-transmitter/-/issues/3)
 * Add: Introduce Fleet and Project name Tags [#4](https://git.smartme.io/smartme.io/arancino/arancino-services/arancino-transmitter/-/issues/4)
