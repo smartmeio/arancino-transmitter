@@ -9,7 +9,11 @@
 #                   REPO_USR:       nome utente del associato a dev ops per effettuare upload dell'artefatto
 #                   REPO_PWD:       password associata all'utente dev ops
 #                   REPO_BASE_URL:  url di base del repository: https://packages.smartme.io
-#
+#                   DOCKER_HOST: indica il Docker deamon al quale connettersi per effettuare la build 
+#                   DOCKER_DRIVER: definiamo il driver di storage per Docker
+#                   DOCKER_TLS_CERTDIR: in questo modo autentichiamo la connessione con il demone docker utilizzando i certificati TLS
+#                   DCK_IMAGE_NAME: contiene il nome dell'immagine
+
 
 image: smartmeio/python:3.9-alpine3.10
 
@@ -17,8 +21,23 @@ stages:
   - start
   - push
   - package
+  - docker
   - upload
   - cleanup
+
+default:
+  services:
+    - name: docker:23-dind
+      alias: thedockerhost
+
+variables:
+  #Docker deamon è attivo sull'host chiamato "thedockerhost che ascolta sulla porta 2375, la porta di default del Docker daemon"
+  DOCKER_HOST: tcp://thedockerhost:2375/ 
+  #Il driver overlay2 è comunemente usato per gestire i livelli di immagini e lo storage su un sistema Docker. 
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DCK_IMAGE_NAME: smartmeio/arancino-transmitter
+
 
 #################################
 #######       START       #######
@@ -128,6 +147,47 @@ package:
     - tags
 
 
+#################################
+######## DOCKER BUILD ###########
+#################################
+
+############ ALPINE #############
+docker_alpine_build:
+  stage: docker
+  image: docker:23
+  before_script:
+    - echo -n "$DCK_TOKEN" | docker login --username "$DCK_USER" --password-stdin
+  script:
+    - DCK_TAG=- DCK_TAG=${CI_COMMIT_TAG}-alpine
+    - docker buildx create --use
+    - docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile-alpine-arancino-transmitter.dockerfile -t $DCK_IMAGE_NAME:$DCK_TAG --push .
+    - > 
+      if [[ ${PRE_RELEASE} == "test"  ]] || [[ ${PRE_RELEASE} == "rc"  ]] || [[ ${PRE_RELEASE} == "beta"  ]] || [[ ${PRE_RELEASE} == "alpha"  ]]; then
+        echo "not performing TAG latest";
+      else
+        DCK_TAG=latest
+        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile-alpine-arancino-transmitter.dockerfile -t $DCK_IMAGE_NAME:$DCK_TAG --push .
+        
+        DCK_TAG=${CI_COMMIT_TAG}
+        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile-alpine-arancino-transmitter.dockerfile -t $DCK_IMAGE_NAME:$DCK_TAG --push .
+      fi
+
+
+  only:
+    - tags
+
+############ DEBIAN #############
+docker_debian_build:
+  stage: docker
+  image: docker:23
+  before_script:
+    - echo -n "$DCK_TOKEN" | docker login --username "$DCK_USER" --password-stdin
+  script:
+    - DCK_TAG=${CI_COMMIT_TAG}-debian
+    - docker buildx create --use
+    - docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile-debian-arancino-transmitter.dockerfile -t $DCK_IMAGE_NAME:$DCK_TAG --push .
+  only:
+    - tags
 
 #################################
 #######       UPLOAD      #######
