@@ -37,6 +37,10 @@ COPY ./extras/pip.conf /etc/pip.conf
 # Create a temporary directory in the Docker image
 WORKDIR /tmp
 
+# Installazione dei requirements
+COPY ./requirements.txt /tmp
+RUN pip3 install -r requirements.txt
+
 # Copy the contents of tmp from the build context to the Docker image
 COPY tmp/ .
 
