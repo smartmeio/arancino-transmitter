@@ -1,4 +1,4 @@
-FROM alpine:3.14.2
+FROM alpine:3.18.6
 
 RUN : \
     && apk update \
@@ -37,9 +37,11 @@ COPY ./extras/pip.conf /etc/pip.conf
 # Create a temporary directory in the Docker image
 WORKDIR /tmp
 
+COPY ./requirements.txt /tmp/requirements.txt
+RUN pip3 install -v --no-cache-dir -r requirements.txt
+
 # Copy the contents of tmp from the build context to the Docker image
 COPY tmp/ .
-
 
 
 # Estraggo il nome del file da pgk_name.txt
