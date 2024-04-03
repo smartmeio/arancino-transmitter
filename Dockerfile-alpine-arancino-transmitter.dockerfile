@@ -1,14 +1,9 @@
-FROM alpine:3.14.2
+FROM alpine:3.18.6
 
 RUN : \
     && apk update \
-    && apk add vim wget nano curl python3 python3-dev linux-pam \
-       gcc musl-dev linux-headers procps coreutils bash shadow \
-       sudo net-tools libffi libffi-dev openssl openssl-dev sed \
-       libusb libusb-dev libftdi1 libftdi1-dev avrdude openocd \
-       g++ make libressl-dev libc-dev musl-dev build-base \
-       bsd-compat-headers bash-completion cmake bluez\
-    && :
+    && apk add python3 python3-dev bash
+
 
 ARG user=me
 ARG group=me
