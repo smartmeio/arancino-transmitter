@@ -32,8 +32,10 @@ COPY ./extras/pip.conf /etc/pip.conf
 WORKDIR $ARANCINO_HOME
 
 COPY . $ARANCINO_HOME
-RUN pip3 install --no-cache -r ./requirements.txt
-RUN pip3 install -v --no-cache .
+
+RUN pip3 install -r ./requirements.txt && \
+  pip3 install -v . \
+  && pip3 cache purge
 
 COPY ./config/transmitter.cfg.yml /etc/arancino/config/transmitter.cfg.yml
 
