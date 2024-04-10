@@ -24,11 +24,14 @@ import logging
 import sys
 import os
 import semantic_version
-from ruamel.yaml import YAML
 import arancino_transmitter
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from arancino_transmitter.ArancinoConstants import EnvType
+import re
+from typing import Any
+import yaml
+from yaml.parser import ParserError
 
 
 
@@ -216,62 +219,59 @@ class ArancinoEnvironment:
     """
 
 
-@Singleton
-class ArancinoTransmitterConfig:
+# @Singleton
+# class ArancinoTransmitterConfig:
 
-    def __init__(self):
-        self.__yaml = YAML()#YAML(typ='safe', pure=True)
+#     def __init__(self):
+#         self.__yaml = YAML()#YAML(typ='safe', pure=True)
 
-        _env = ArancinoEnvironment.Instance().env
-        _cfg_dir = ArancinoEnvironment.Instance().cfg_dir
-        _cfg_file = ""
-        self.__files = []
-        self._cfgs = {}
+#         _env = ArancinoEnvironment.Instance().env
+#         _cfg_dir = ArancinoEnvironment.Instance().cfg_dir
+#         _cfg_file = ""
+#         self.__files = []
+#         self._cfgs = {}
 
-        from pathlib import Path
-        for yml_path in Path(_cfg_dir).glob("transmitter.flow.*.cfg.yml"):
-            self.__files.append(yml_path)
+#         from pathlib import Path
+#         for yml_path in Path(_cfg_dir).glob("transmitter.flow.*.cfg.yml"):
+#             self.__files.append(yml_path)
 
-        self.__open()
-
-
-
-    def __open(self):
-
-        for f in self.__files:
-            with open(f, "r") as ymlfile:
-                #self._cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-                y = self.__yaml.load(ymlfile)
-                self._cfgs[y.get("flow").get("name").lower()] = y
-                ymlfile.close()
-
-
-    def save(self, flow_name):
-        yaml = YAML()
-        file = os.path.join(ArancinoEnvironment.Instance().cfg_dir, "transmitter.flow.{}.cfg.yml".format(flow_name))
-        for f in self.__files:
-
-            if str(f) == file:
-                with open(f, "w") as ymlfile:
-                    yaml.dump(self._cfgs[flow_name], ymlfile)
-                    ymlfile.close()
-                break
+#         self.__open()
 
 
 
+#     def __open(self):
+
+#         for f in self.__files:
+#             with open(f, "r") as ymlfile:
+#                 #self._cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+#                 y = self.__yaml.load(ymlfile)
+#                 self._cfgs[y.get("flow").get("name").lower()] = y
+#                 ymlfile.close()
 
 
-    @property
-    def cfgs(self):
-        return self._cfgs
+#     def save(self, flow_name):
+#         yaml = YAML()
+#         file = os.path.join(ArancinoEnvironment.Instance().cfg_dir, "transmitter.flow.{}.cfg.yml".format(flow_name))
+#         for f in self.__files:
+
+#             if str(f) == file:
+#                 with open(f, "w") as ymlfile:
+#                     yaml.dump(self._cfgs[flow_name], ymlfile)
+#                     ymlfile.close()
+#                 break
+
+#     @property
+#     def cfgs(self):
+#         return self._cfgs
 
 
 @Singleton
 class ArancinoConfig:
 
-    def __init__(self):
-        self.__yaml = YAML()#YAML(typ='safe', pure=True)
+    _var_matcher = re.compile(r"\${([^}^{]+)}")
+    _tag_matcher = re.compile(r"[^$]*\${([^}^{]+)}.*")
 
+    def __init__(self):
         _env = ArancinoEnvironment.Instance().env
         _cfg_dir = ArancinoEnvironment.Instance().cfg_dir
         _cfg_file = ""
@@ -291,21 +291,35 @@ class ArancinoConfig:
 
         self.__open()
 
+    def _path_constructor(self, _loader: Any, node: Any):
+
+        def parse_default_value(s):
+            try:
+                return int(s) if s.isdigit() else float(s) if "." in s else complex(s)
+            except (ValueError, AttributeError):
+                return s
+
+        def replace_fn(match):
+            envparts = f"{match.group(1)}:".split(":")
+            return os.environ.get(envparts[0], envparts[1])
+        return parse_default_value(self._var_matcher.sub(replace_fn, node.value))
 
 
     def __open(self):
-        with open(self.__file, "r") as ymlfile:
-            #self._cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-            self._cfg = self.__yaml.load(ymlfile)
-            ymlfile.close()
+        yaml.add_implicit_resolver("!envvar", self._tag_matcher, None, yaml.SafeLoader)
+        yaml.add_constructor("!envvar", self._path_constructor, yaml.SafeLoader)
+        try:
+            with open(self.__file, "r") as f:
+                self._cfg = yaml.safe_load(f.read())
+                return  self._cfg
+        except (FileNotFoundError, PermissionError, ParserError):
+            return  self._cfg
 
     def save(self):
-        yaml = YAML()
-        with open(self.__file, "w") as ymlfile:
-            yaml.dump(self._cfg, ymlfile)
-            ymlfile.close()
-
-        #self.__open()
+        with open(self.__file, 'w') as yaml_file:
+            yaml.dump(self._cfg, yaml_file, default_flow_style=False)
+            yaml_file.close()
+        self.__open()
 
 
     @property
